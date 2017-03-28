@@ -148,3 +148,5 @@ Web image for [40] "Roundabout mandatory" had the following probability distribu
 	                         [11] Right-of-way at the next intersection = 0.7%
 	                         [ 6] End of speed limit (80km/h) = 0.5%
 ```
+
+The downloaded test images resulted in a 86.7% accuracy, which is lower than the provided test set's accuracy of 94.5%. As mentioned above, I suspect that the images I downloaded are cropped tigher around the traffic signs, which may impact the result. So to me it seems that the model I trained overfitted the provided data and hence yields lower accuracy provided different data. In any case, I wish there were more German traffic sign data sets with a more even distribution of traffic sign classes.
