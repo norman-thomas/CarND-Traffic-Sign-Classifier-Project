@@ -16,11 +16,6 @@ The goals / steps of this project are the following:
 [image3]: ./output_19_0.png "preprocessed traffic sign sample from each category"
 
 
-[image4]: ./examples/placeholder.png "Traffic Sign 1"
-[image5]: ./examples/placeholder.png "Traffic Sign 2"
-[image6]: ./examples/placeholder.png "Traffic Sign 3"
-[image7]: ./examples/placeholder.png "Traffic Sign 4"
-[image8]: ./examples/placeholder.png "Traffic Sign 5"
 
 ## Rubric Points
 
@@ -39,6 +34,8 @@ Looking at the actual image data, all images have a size of `32`x`32` pixels and
 
 ### Design and Test a Model Architecture
 
+#### Preprocessing
+
 Before feeding the images to the neural network, the input data needs to be normalized. As the images consists of pixels with 3 color channels, each containing values between `0` and `255`, they need to be normalized so that their absolute values are smaller than `1` and their mean value is around `0`. I decided to normalize the values to a range of `[-0.5, +0.5]` with the help of the OpenCV function `cv2.normalize` using the parameter `cv2.NORM_MINMAX`, which happens to help with unbalanced brightness in an image as well. The result is that very dark images are brightened. All the preprocessing is done in code cell 7 and 8.
 
 Here's what the images look like after preprocessing, and for comparison again the original images before preprocessing:
@@ -49,64 +46,47 @@ After:
 Before:
 ![Before Preprocessing][image2]
 
+I decided not to convert to grayscale as I felt that colors do provide valuable information when classifying traffic signs, especially in low resolutions like the 32x32 pixels the images are provided in. Such cases would for example be the "general caution" and "traffic light ahead" signs, both triangular with red borders and white backgrounds. But from afar, without color, indistinguishable. Only the 3 colors representing the traffic light set it apart from the black exclamation mark in the center. Other such similar traffic signs exist in Germany, albeit not included in this data set.
+
+#### Augmentation
+
+I saw the suggestion to use augmentation on the review page. However, I decided not to include that step as it seems fragile to me, i.e. introducing gray or black borders when rotating, etc., and because the current solution provided > 93% accuracy for all data set segments.
+
+#### Model
+
+As the project introduction in the classroom suggested starting with LeNet, I did just that by using the LeNet solution we had from the previous lab. Initially results were not as good as I had anticipated, with epoch 1 validation accuracy being mostly below 50%. Up to 15 epochs usually yielded an accuracy of about 70-80%. By tweaking some parameters I managed to squeeze 90-91% out of it, but still not stable and good enough for the required > 93%. I then introduced another convolutional layer and adjusted the layer dimensions. Another valuable change was reducing sigma `σ` from `0.1` to `0.05`. The default learning rate of `0.001` worked well for me.
+
+I removed any pooling as I had the feeling it reduced too much data for the little data each 32x32 image had and, somewhere in the process, decreased the accuracy. Another modification I made, was to use dropouts in two fully connected layers, in order to improve the reliability of the model. (code cell 10)
+
+This resulted in the following architecture.
+
+| Layer         	      	|     Description	                         					| 
+|:---------------------:|:---------------------------------------------:| 
+| Input         	      	| 32x32x3 RGB image                      							| 
+| Convolution 3x3      	| 1x1 stride, valid padding, outputs 28x28x16	  |
+| RELU			             		|												                                   |
+| Convolution 3x3	      | 1x1 stride, valid padding, outputs 14x14x32			|
+| RELU			             		|												                                   |
+| Convolution 3x3	      | 1x1 stride, valid padding, outputs 10x10x64			|
+| RELU			             		|												                                   |
+| Fully connected		     | flattened previous, outputs 1x6400   									|
+| Fully connected		     | outputs 1x120    								                    	|
+| RELU			             		|												                                   |
+| dropout             		|	keep 75%			                                   |
+| Fully connected		     | outputs 1x84     								                    	|
+| RELU			             		|												                                   |
+| dropout             		|	keep 75%			                                   |
+| Fully connected		     | result layer, outputs 1x43     								       |
+
+
+I didn't need to split training, validation and test data anymore as they already came provided seperately in three different Pickle files.
+
+The training of the model happens in code cell 14. I picked only 5 epochs, because the model did not improve considerably beyond that.
+
+I checked the model's accuracy with the ` evaluate` function from the classroom.
+
 
 ---
-
-
-###Data Set Summary & Exploration
-
-####1. Provide a basic summary of the data set and identify where in your code the summary was done. In the code, the analysis should be done using python, numpy and/or pandas methods rather than hardcoding results manually.
-
-
-###Design and Test a Model Architecture
-
-####1. Describe how, and identify where in your code, you preprocessed the image data. What tecniques were chosen and why did you choose these techniques? Consider including images showing the output of each preprocessing technique. Pre-processing refers to techniques such as converting to grayscale, normalization, etc.
-
-The code for this step is contained in the fourth code cell of the IPython notebook.
-
-As a first step, I decided to convert the images to grayscale because ...
-
-Here is an example of a traffic sign image before and after grayscaling.
-
-![alt text][image2]
-
-As a last step, I normalized the image data because ...
-
-####2. Describe how, and identify where in your code, you set up training, validation and testing data. How much data was in each set? Explain what techniques were used to split the data into these sets. (OPTIONAL: As described in the "Stand Out Suggestions" part of the rubric, if you generated additional data for training, describe why you decided to generate additional data, how you generated the data, identify where in your code, and provide example images of the additional data)
-
-The code for splitting the data into training and validation sets is contained in the fifth code cell of the IPython notebook.  
-
-To cross validate my model, I randomly split the training data into a training set and validation set. I did this by ...
-
-My final training set had X number of images. My validation set and test set had Y and Z number of images.
-
-The sixth code cell of the IPython notebook contains the code for augmenting the data set. I decided to generate additional data because ... To add more data to the the data set, I used the following techniques because ... 
-
-Here is an example of an original image and an augmented image:
-
-![alt text][image3]
-
-The difference between the original data set and the augmented data set is the following ... 
-
-
-####3. Describe, and identify where in your code, what your final model architecture looks like including model type, layers, layer sizes, connectivity, etc.) Consider including a diagram and/or table describing the final model.
-
-The code for my final model is located in the seventh cell of the ipython notebook. 
-
-My final model consisted of the following layers:
-
-| Layer         		|     Description	        					| 
-|:---------------------:|:---------------------------------------------:| 
-| Input         		| 32x32x3 RGB image   							| 
-| Convolution 3x3     	| 1x1 stride, same padding, outputs 32x32x64 	|
-| RELU					|												|
-| Max pooling	      	| 2x2 stride,  outputs 16x16x64 				|
-| Convolution 3x3	    | etc.      									|
-| Fully connected		| etc.        									|
-| Softmax				| etc.        									|
-|						|												|
-|						|												|
- 
 
 
 ####4. Describe how, and identify where in your code, you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
