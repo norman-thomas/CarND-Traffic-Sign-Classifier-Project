@@ -14,6 +14,9 @@ The goals / steps of this project are the following:
 [image1]: ./output_12_0.png "uneven traffic sign type distribution"
 [image2]: ./output_10_0.png "traffic sign sample from each category"
 [image3]: ./output_19_0.png "preprocessed traffic sign sample from each category"
+[image4]: ./output_31_0.png "new test images (Germany)"
+[image5]: ./output_32_0.png "new test images (International)"
+[image6]: ./output_39_1.png "Errors (Germany)"
 
 
 
@@ -81,83 +84,67 @@ This resulted in the following architecture.
 
 I didn't need to split training, validation and test data anymore as they already came provided seperately in three different Pickle files.
 
-The training of the model happens in code cell 14. I picked only 5 epochs, because the model did not improve considerably beyond that.
+The training of the model happens in code cell 14. I picked only 5 epochs, because the model did not improve considerably beyond that. As for the batch size, I used `128`, which gave good results. Increasing the size would speed up learning, but gave worse results. Batch sizes like `64` were slower, but did not improve the accuracy, so the final `128` were a good balance between the learning speed and a high accuracy.
 
-I checked the model's accuracy with the ` evaluate` function from the classroom.
+I checked the model's accuracy with the `evaluate` function from the classroom.
 
+My final model results (using code cell 13 and 14) were:
+* training set accuracy of 0.992
+* validation set accuracy of 0.963
+* test set accuracy of 0.945
 
----
+### Test a Model on New Images
 
+#### Image Selection
 
-####4. Describe how, and identify where in your code, you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
+I decided to test my model with 15 images of German traffic signs found on Google Image Search and Goole Street View. 
 
-The code for training the model is located in the eigth cell of the ipython notebook. 
+![German test images][image4]
 
-To train the model, I used an ....
+Furthermore, for the fun of it, I wanted to see whether my model would be able to recognize untrained traffic signs. For that, I downloaded 10 more traffic sign photos from the UK, US, China, Japan and an electronic traffic sign from Germany. I picked signs that belong to the categories trained and, for a human driver, would be recognizable even when encountered for the first time.
 
-####5. Describe the approach taken for finding a solution. Include in the discussion the results on the training, validation and test sets and where in the code these were calculated. Your approach may have been an iterative process, in which case, outline the steps you took to get to the final solution and why you chose those steps. Perhaps your solution involved an already well known implementation or architecture. In this case, discuss why you think the architecture is suitable for the current problem.
+![International test images][image5]
 
-The code for calculating the accuracy of the model is located in the ninth cell of the Ipython notebook.
+All images were cropped and resized by me. But, apparently, they mostly fill out the frame, whereas the training and test data's traffic signs are usually smaller compared to the 32x32 frame. Additionally, some of my images are a bit tilted whereas upon first glance the provided dataset contains frontal images.
 
-My final model results were:
-* training set accuracy of ?
-* validation set accuracy of ? 
-* test set accuracy of ?
+#### Prediction Results
 
-If an iterative approach was chosen:
-* What was the first architecture that was tried and why was it chosen?
-* What were some problems with the initial architecture?
-* How was the architecture adjusted and why was it adjusted? Typical adjustments could include choosing a different model architecture, adding or taking away layers (pooling, dropout, convolution, etc), using an activation function or changing the activation function. One common justification for adjusting an architecture would be due to over fitting or under fitting. A high accuracy on the training set but low accuracy on the validation set indicates over fitting; a low accuracy on both sets indicates under fitting.
-* Which parameters were tuned? How were they adjusted and why?
-* What are some of the important design choices and why were they chosen? For example, why might a convolution layer work well with this problem? How might a dropout layer help with creating a successful model?
+As calculated in code cell 21, the accuracy of the model is as follows:
 
-If a well known architecture was chosen:
-* What architecture was chosen?
-* Why did you believe it would be relevant to the traffic sign application?
-* How does the final model's accuracy on the training, validation and test set provide evidence that the model is working well?
- 
+```
+86.7% correct (Germany)
+50.0% correct (International)
+```
 
-###Test a Model on New Images
+The wrongly classified German traffic signs are, quite surprisingly (code cell 22):
 
-####1. Choose five German traffic signs found on the web and provide them in the report. For each image, discuss what quality or qualities might be difficult to classify.
+![Errors (Germany)][image6]
 
-Here are five German traffic signs that I found on the web:
+My guess is that the left sign (speed limit 50km/h) is photographed from the lower left and therefore a bit distorted. The right sign (speed limit 70km/h) may be too tighly cropped.
 
-![alt text][image4] ![alt text][image5] ![alt text][image6] 
-![alt text][image7] ![alt text][image8]
+As for the international traffic signs, I am positively surprised that a 50% accuracy was achieved.
 
-The first image might be difficult to classify because ...
+In code cell 24, a bar chart displays the top 5 probability distributions of the German traffic signs I tested. The erroneous ones are marked with a ❌. The model generally favors one traffic sign class by a large margin. In three cases, though, two of which were wrongly predicted, the probability is below 5% for each class. The roundabout was ultimately correct.
 
-####2. Discuss the model's predictions on these new traffic signs and compare the results to predicting on the test set. Identify where in your code predictions were made. At a minimum, discuss what the predictions were, the accuracy on these new predictions, and compare the accuracy to the accuracy on the test set (OPTIONAL: Discuss the results in more detail as described in the "Stand Out Suggestions" part of the rubric).
+```
+❌ Web image for [ 2] "Speed limit (50km/h)" had the following probability distribution:
+	██                       [ 5] Speed limit (80km/h) = 5.3%
+	█                        [36] Go straight or right = 3.0%
+	█                        [ 3] Speed limit (60km/h) = 2.4%
+	                         [20] Dangerous curve to the right = -0.7%
+	                         [23] Slippery road = -1.0%
 
-The code for making predictions on my final model is located in the tenth cell of the Ipython notebook.
+❌ Web image for [ 4] "Speed limit (70km/h)" had the following probability distribution:
+	█                        [ 1] Speed limit (30km/h) = 2.9%
+	                         [ 8] Speed limit (120km/h) = 0.2%
+	                         [ 5] Speed limit (80km/h) = -0.3%
+	                         [ 4] Speed limit (70km/h) = -0.3%
+	                         [ 0] Speed limit (20km/h) = -0.6%
 
-Here are the results of the prediction:
-
-| Image			        |     Prediction	        					| 
-|:---------------------:|:---------------------------------------------:| 
-| Stop Sign      		| Stop sign   									| 
-| U-turn     			| U-turn 										|
-| Yield					| Yield											|
-| 100 km/h	      		| Bumpy Road					 				|
-| Slippery Road			| Slippery Road      							|
-
-
-The model was able to correctly guess 4 of the 5 traffic signs, which gives an accuracy of 80%. This compares favorably to the accuracy on the test set of ...
-
-####3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction and identify where in your code softmax probabilities were outputted. Provide the top 5 softmax probabilities for each image along with the sign type of each probability. (OPTIONAL: as described in the "Stand Out Suggestions" part of the rubric, visualizations can also be provided such as bar charts)
-
-The code for making predictions on my final model is located in the 11th cell of the Ipython notebook.
-
-For the first image, the model is relatively sure that this is a stop sign (probability of 0.6), and the image does contain a stop sign. The top five soft max probabilities were
-
-| Probability         	|     Prediction	        					| 
-|:---------------------:|:---------------------------------------------:| 
-| .60         			| Stop sign   									| 
-| .20     				| U-turn 										|
-| .05					| Yield											|
-| .04	      			| Bumpy Road					 				|
-| .01				    | Slippery Road      							|
-
-
-For the second image ... 
+Web image for [40] "Roundabout mandatory" had the following probability distribution:
+	██                       [40] Roundabout mandatory = 4.8%
+	█                        [ 7] Speed limit (100km/h) = 2.4%
+	                         [ 5] Speed limit (80km/h) = 0.8%
+	                         [11] Right-of-way at the next intersection = 0.7%
+	                         [ 6] End of speed limit (80km/h) = 0.5%
+```
