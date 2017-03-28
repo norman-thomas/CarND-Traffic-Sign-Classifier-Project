@@ -1,12 +1,4 @@
-#**Traffic Sign Recognition** 
-
-##Writeup Template
-
-###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
-
----
-
-**Build a Traffic Sign Recognition Project**
+# Traffic Sign Recognition Project
 
 The goals / steps of this project are the following:
 * Load the data set (see below for links to the project data set)
@@ -19,9 +11,11 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./examples/visualization.jpg "Visualization"
-[image2]: ./examples/grayscale.jpg "Grayscaling"
-[image3]: ./examples/random_noise.jpg "Random Noise"
+[image1]: ./output_12_0.png "uneven traffic sign type distribution"
+[image2]: ./output_10_0.png "traffic sign sample from each category"
+[image3]: ./output_19_0.png "preprocessed traffic sign sample from each category"
+
+
 [image4]: ./examples/placeholder.png "Traffic Sign 1"
 [image5]: ./examples/placeholder.png "Traffic Sign 2"
 [image6]: ./examples/placeholder.png "Traffic Sign 3"
@@ -29,36 +23,40 @@ The goals / steps of this project are the following:
 [image8]: ./examples/placeholder.png "Traffic Sign 5"
 
 ## Rubric Points
-###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.  
+
+### Data Set Summary & Exploration
+
+The training set has 34,799 road signs, the test set has 12,630 (Code cell 2).
+Those images are very unevenly distributed over the 43 categories as shown in the histogram below.
+
+![Histogram (from code cell 6)][image1]
+
+The uneven distribution is also true for the validation and test sets. This bears the problem that for pure probabiliy reasons the model will inevitably lean towards the more numerous traffic signs as opposed to the rare ones with less than 250 training samples.
+
+Looking at the actual image data, all images have a size of `32`x`32` pixels and are color images. The size of the traffic sign within the image varies, but the most obvious difference is the brightness of the photos (see code cell 5). While some are very well lit, some other are almost completely black. In total, there are 43 different kinds of traffic signs.
+
+![Traffic sign categories (from code cell 5)][image2]
+
+### Design and Test a Model Architecture
+
+Before feeding the images to the neural network, the input data needs to be normalized. As the images consists of pixels with 3 color channels, each containing values between `0` and `255`, they need to be normalized so that their absolute values are smaller than `1` and their mean value is around `0`. I decided to normalize the values to a range of `[-0.5, +0.5]` with the help of the OpenCV function `cv2.normalize` using the parameter `cv2.NORM_MINMAX`, which happens to help with unbalanced brightness in an image as well. The result is that very dark images are brightened. All the preprocessing is done in code cell 7 and 8.
+
+Here's what the images look like after preprocessing, and for comparison again the original images before preprocessing:
+
+After:
+![After Preprocessing][image3]
+
+Before:
+![Before Preprocessing][image2]
+
 
 ---
-###Writeup / README
 
-####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one. You can submit your writeup as markdown or pdf. You can use this template as a guide for writing the report. The submission includes the project code.
-
-You're reading it! and here is a link to my [project code](https://github.com/udacity/CarND-Traffic-Sign-Classifier-Project/blob/master/Traffic_Sign_Classifier.ipynb)
 
 ###Data Set Summary & Exploration
 
 ####1. Provide a basic summary of the data set and identify where in your code the summary was done. In the code, the analysis should be done using python, numpy and/or pandas methods rather than hardcoding results manually.
 
-The code for this step is contained in the second code cell of the IPython notebook.  
-
-I used the pandas library to calculate summary statistics of the traffic
-signs data set:
-
-* The size of training set is ?
-* The size of test set is ?
-* The shape of a traffic sign image is ?
-* The number of unique classes/labels in the data set is ?
-
-####2. Include an exploratory visualization of the dataset and identify where the code is in your code file.
-
-The code for this step is contained in the third code cell of the IPython notebook.  
-
-Here is an exploratory visualization of the data set. It is a bar chart showing how the data ...
-
-![alt text][image1]
 
 ###Design and Test a Model Architecture
 
